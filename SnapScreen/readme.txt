@@ -1,6 +1,6 @@
-Snap Screen App™
-Version 1.0
-Copyright © Copyright (C) 2005 Isaac Serafino www.SerafinoSoftware.com
+Snap Screen Appâ„¢
+Version 1.1
+Copyright Â© 2005 Isaac Serafino www.SerafinoSoftware.com
 
 This version does not have a friendly way to shut down the software after it is started. Currently the JVM must be interrupted (or the process must be killed) to shut it down.
 
