@@ -83,8 +83,10 @@ public class SnapScreen {
 
 		String authorizeUrl = webAuth.authorize(webAuthRequest);
 		String code = (String) JOptionPane.showInputDialog(null,
-				"Follow these steps to authorize where Snap Screen will send screenshots.\n"
-						+ "You should only have to do this the first time.\n"
+				"Follow these steps to authorize Snap Screen to send screenshots to your desired Dropbox account.*\n"
+						+ "You should only have to do this the first time.\n\n"
+						+ "*Dropbox and the Dropbox logo are trademarks of Dropbox, Inc.\n"
+						+ "Snap Screen is not affiliated with or otherwise sponsored by Dropbox, Inc.\n\n"
 						+ "1. Go to the Internet address in the box below.\n"
 						+ "2. Click \"Allow\" (you might have to log in first).\n" + "3. Copy the authorization code.\n"
 						+ "Enter the authorization code here, in place of the Internet address: ",
