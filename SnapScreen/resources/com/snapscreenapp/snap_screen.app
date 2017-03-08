@@ -1,4 +1,2 @@
-{
-  "key": "[Insert API Key Here]",
-  "secret": "[Insert API Key Secret Here]"
-}
+If you are a member of the development team, please ask a project admin for your own copy of this information, and do not check it in.
+If you are using this source code to develop a different app, you must get this app information from Dropbox for your own app.
