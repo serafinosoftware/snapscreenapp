@@ -30,8 +30,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Base64;
+import java.util.Base64.Decoder;
 import java.util.Date;
 import java.util.Random;
+import java.util.Scanner;
 
 import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
@@ -69,7 +72,17 @@ public class SnapScreen {
 		DbxAppInfo appInfo;
 		try {
 			InputStream stream = SnapScreen.class.getResourceAsStream("snap_screen.app");
-			appInfo = DbxAppInfo.Reader.readFully(stream);
+			Scanner scanner = new Scanner(stream);
+			scanner.useDelimiter("\\A");
+			String encoded;
+			try {
+				encoded = scanner.next();
+			} finally {
+				scanner.close();
+			}
+			Decoder decoder = Base64.getDecoder();
+			byte[] json = decoder.decode(encoded);
+			appInfo = DbxAppInfo.Reader.readFully(json);
 		} catch (JsonReadException ex) {
 			System.err.println("Error reading <app-info-file>: " + ex.getMessage());
 			System.exit(1);
