@@ -21,9 +21,16 @@ package com.snapscreenapp;
 
 import java.awt.AWTException;
 import java.awt.Dimension;
+import java.awt.Image;
+import java.awt.MenuItem;
+import java.awt.PopupMenu;
 import java.awt.Rectangle;
 import java.awt.Robot;
+import java.awt.SystemTray;
 import java.awt.Toolkit;
+import java.awt.TrayIcon;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -37,6 +44,7 @@ import java.util.Random;
 import java.util.Scanner;
 
 import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 
 import com.dropbox.core.DbxAppInfo;
@@ -95,6 +103,9 @@ public class SnapScreen {
 		DbxWebAuth.Request webAuthRequest = DbxWebAuth.newRequestBuilder().withNoRedirect().build();
 
 		String authorizeUrl = webAuth.authorize(webAuthRequest);
+
+		ImageIcon iconImage = new ImageIcon(retrieveIcon());
+
 		String code = (String) JOptionPane.showInputDialog(null,
 				"Follow these steps to authorize Snap Screen to send screenshots to your desired Dropbox account.*\n"
 						+ "You should only have to do this the first time.\n\n"
@@ -103,7 +114,7 @@ public class SnapScreen {
 						+ "1. Go to the Internet address in the box below.\n"
 						+ "2. Click \"Allow\" (you might have to log in first).\n" + "3. Copy the authorization code.\n"
 						+ "Enter the authorization code here, in place of the Internet address: ",
-				"Authorize Snap Screen", JOptionPane.QUESTION_MESSAGE, null, null, authorizeUrl);
+				"Authorize Snap Screen", JOptionPane.QUESTION_MESSAGE, iconImage, null, authorizeUrl);
 
 		if (code == null) {
 			System.exit(1);
@@ -144,6 +155,8 @@ public class SnapScreen {
 	private Random random;
 	private Rectangle rectangle;
 	private Robot robot;
+	private TrayIcon trayIcon;
+	private static Image icon;
 
 	public SnapScreen(String password) {
 		this.password = password;
@@ -199,7 +212,7 @@ public class SnapScreen {
 	 * @param dropboxPath
 	 *            Where to upload the file to within Dropbox
 	 */
-	private static void uploadFile(DbxClientV2 dbxClient, InputStream in, String dropboxPath) {
+	private void uploadFile(DbxClientV2 dbxClient, InputStream in, String dropboxPath) {
 		try {
 			FileMetadata metadata = dbxClient.files().uploadBuilder(dropboxPath).withMode(WriteMode.ADD)
 					.withClientModified(new Date()).uploadAndFinish(in);
@@ -207,12 +220,15 @@ public class SnapScreen {
 			System.out.println(metadata.toStringMultiline());
 		} catch (UploadErrorException ex) {
 			System.err.println("Error uploading to Dropbox: " + ex.getMessage());
+			removeNotificationIcon();
 			System.exit(1);
 		} catch (DbxException ex) {
 			System.err.println("Error uploading to Dropbox: " + ex.getMessage());
+			removeNotificationIcon();
 			System.exit(1);
 		} catch (IOException ex) {
 			System.err.println("Error reading from stream \"" + in + "\": " + ex.getMessage());
+			removeNotificationIcon();
 			System.exit(1);
 		}
 	}
@@ -220,6 +236,8 @@ public class SnapScreen {
 	private void start() {
 		BufferedImage screenshot;
 		long interval;
+
+		placeNotificationIcon();
 
 		while (true) {
 			try {
@@ -244,5 +262,61 @@ public class SnapScreen {
 				break;
 			}
 		}
+
+		removeNotificationIcon();
+	}
+
+	private void removeNotificationIcon() {
+		SystemTray tray = SystemTray.getSystemTray();
+		tray.remove(trayIcon);
+	}
+
+	private void placeNotificationIcon() {
+		if (!SystemTray.isSupported()) {
+			System.err.println("Must run on a system that supports System Tray.");
+			System.exit(1);
+		}
+
+		SystemTray tray = SystemTray.getSystemTray();
+
+		PopupMenu menu = new PopupMenu();
+		MenuItem exitItem = new MenuItem("Exit");
+		exitItem.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				removeNotificationIcon();
+				System.exit(0);
+			}
+		});
+
+		menu.add(exitItem);
+
+		Image iconImage = retrieveIcon();
+
+		trayIcon = new TrayIcon(iconImage, "Snap Screen", menu);
+		trayIcon.setImageAutoSize(true);
+
+		try {
+			tray.add(trayIcon);
+		} catch (AWTException e) {
+			System.err.println("Error adding System Tray icon.");
+			e.printStackTrace();
+			System.exit(1);
+		}
+	}
+
+	private static Image retrieveIcon() {
+		InputStream stream = SnapScreen.class.getResourceAsStream("icon_48.png");
+		if (icon == null) {
+			try {
+				icon = ImageIO.read(stream);
+			} catch (IOException e1) {
+				System.err.println("Error loading icon image.");
+				e1.printStackTrace();
+				System.exit(1);
+			}
+		}
+
+		return icon;
 	}
 }

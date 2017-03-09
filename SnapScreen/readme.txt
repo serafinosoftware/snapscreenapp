@@ -19,10 +19,6 @@ The first time Snap Screen App™ is run, it requires the user to login to a
 cloud storage account (compatible with Dropbox) where the screenshots will be
 sent.
 
-This version does not have a friendly way to shut down the software after it is
-started. Currently the JVM must be interrupted (or the process must be killed)
-to shut it down.
-
 
 For the source code, please see:
 https://github.com/serafinosoftware/snapscreenapp
