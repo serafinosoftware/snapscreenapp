@@ -25,6 +25,6 @@ https://github.com/serafinosoftware/snapscreenapp
 
 For the license, please see:
 COPYING.LESSER.txt
-    
+
 Dropbox and the Dropbox logo are trademarks of Dropbox, Inc.
 Snap Screen App™ is not affiliated with or otherwise sponsored by Dropbox, Inc.
