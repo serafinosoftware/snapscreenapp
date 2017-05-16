@@ -34,9 +34,9 @@ public class SnapScreen {
 		CloudAuthorization authorization = new CloudAuthorization(icon);
 		String password = authorization.retrievePassword();
 
-		NotificationIcon notificationIcon = new NotificationIcon(icon, password);
-		Sender sender = new Sender(password, notificationIcon);
+		Sender sender = new Sender(password);
 
+		NotificationIcon notificationIcon = new NotificationIcon(icon);
 		ScreenMonitor screenMonitor = new ScreenMonitor();
 		SnapScreen snapScreen = new SnapScreen(sender, notificationIcon, screenMonitor);
 		snapScreen.start();

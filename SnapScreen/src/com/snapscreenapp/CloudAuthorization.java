@@ -35,14 +35,8 @@ public class CloudAuthorization {
 	}
 
 	private void authorize() throws IOException {
-		String deviceId = randomUUID().toString();
-
-		System.out.println("Authorization complete.");
-		System.out.println("- Device ID: " + deviceId);
-
-		Files.write(Paths.get("authorization.txt"), deviceId.getBytes());
-
-		DeviceId id = new DeviceId(deviceId);
-		id.show(iconImage);
+		SupervisorId deviceId = new SupervisorId();
+		// TODO: (IMS) What if they cancel?
+		deviceId.retrieve(iconImage);
 	}
 }

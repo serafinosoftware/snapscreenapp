@@ -17,13 +17,11 @@ import java.awt.event.ActionListener;
  *
  */
 public class NotificationIcon {
-	private String deviceId;
 	private Image iconImage;
 	private TrayIcon trayIcon;
 
-	public NotificationIcon(Image iconImage, String deviceId) {
+	public NotificationIcon(Image iconImage) {
 		this.iconImage = iconImage;
-		this.deviceId = deviceId;
 	}
 
 	public void remove() {
@@ -42,13 +40,13 @@ public class NotificationIcon {
 
 		PopupMenu menu = new PopupMenu();
 
-		MenuItem deviceIdItem = new MenuItem("Show Device Code");
+		MenuItem deviceIdItem = new MenuItem("Change Supervisor ID");
 		deviceIdItem.addActionListener(new ActionListener() {
-			private DeviceId id = new DeviceId(deviceId);
+			private SupervisorId id = new SupervisorId();
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				id.show(iconImage);
+				id.retrieve(iconImage);
 			}
 		});
 
