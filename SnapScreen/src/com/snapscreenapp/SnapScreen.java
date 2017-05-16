@@ -28,15 +28,13 @@ import java.util.Random;
 
 import javax.imageio.ImageIO;
 
-import com.dropbox.core.json.JsonReader.FileLoadException;
-
 public class SnapScreen {
-	public static void main(String[] args) throws FileLoadException, IOException {
+	public static void main(String[] args) throws IOException {
 		icon = retrieveIcon();
 		CloudAuthorization authorization = new CloudAuthorization(icon);
 		String password = authorization.retrievePassword();
 
-		NotificationIcon notificationIcon = new NotificationIcon(icon);
+		NotificationIcon notificationIcon = new NotificationIcon(icon, password);
 		Sender sender = new Sender(password, notificationIcon);
 
 		ScreenMonitor screenMonitor = new ScreenMonitor();

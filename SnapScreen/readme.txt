@@ -1,4 +1,5 @@
-Snap Screen App™ - Takes screenshots at random intervals and uploads them 
+Snap Screen™ App - Takes screenshots at semi-random intervals and sends them
+to a supervisor 
 Copyright © 2005 Isaac Serafino www.SerafinoSoftware.com
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Lesser General Public
@@ -14,10 +15,12 @@ Copyright © 2005 Isaac Serafino www.SerafinoSoftware.com
     License along with this library; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-Version 1.1.1
-The first time Snap Screen App™ is run, it requires the user to login to a
-cloud storage account (compatible with Dropbox) where the screenshots will be
-sent.
+Version 1.2.0
+Snap Screen™ App requires the supervisor to create an account, pay the monthly
+fee if applicable, and connect to a cloud storage account (compatible with
+Dropbox) where the screenshots will be sent. The app user should retrieve the
+"Device Code" from the app and provide it to the supervisor to connect the
+device.
 
 
 For the source code, please see:

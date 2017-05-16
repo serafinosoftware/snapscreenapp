@@ -17,11 +17,13 @@ import java.awt.event.ActionListener;
  *
  */
 public class NotificationIcon {
+	private String deviceId;
 	private Image iconImage;
 	private TrayIcon trayIcon;
 
-	public NotificationIcon(Image iconImage) {
+	public NotificationIcon(Image iconImage, String deviceId) {
 		this.iconImage = iconImage;
+		this.deviceId = deviceId;
 	}
 
 	public void remove() {
@@ -39,6 +41,17 @@ public class NotificationIcon {
 		SystemTray tray = SystemTray.getSystemTray();
 
 		PopupMenu menu = new PopupMenu();
+
+		MenuItem deviceIdItem = new MenuItem("Show Device Code");
+		deviceIdItem.addActionListener(new ActionListener() {
+			private DeviceId id = new DeviceId(deviceId);
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				id.show(iconImage);
+			}
+		});
+
 		MenuItem exitItem = new MenuItem("Exit");
 		exitItem.addActionListener(new ActionListener() {
 			@Override
@@ -48,6 +61,7 @@ public class NotificationIcon {
 			}
 		});
 
+		menu.add(deviceIdItem);
 		menu.add(exitItem);
 
 		trayIcon = new TrayIcon(iconImage, "Snap Screen", menu);
