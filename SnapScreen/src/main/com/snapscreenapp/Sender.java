@@ -7,9 +7,13 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.UUID.randomUUID;
 
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
+import java.awt.image.RenderedImage;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
@@ -24,6 +28,8 @@ import javax.imageio.ImageIO;
  *
  */
 public class Sender {
+	public static final String CRLF = "\r\n";
+
 	private String supervisorId;
 
 	public Sender(String supervisorId) {
@@ -31,21 +37,17 @@ public class Sender {
 	}
 
 	public void sendScreenshotMessage(BufferedImage screenshot, long interval) throws IOException {
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		ImageIO.write(screenshot, "jpeg", out);
-		byte[] image = out.toByteArray();
-
-		String filename = "/next_" + interval + ".jpg";
-		//String server = "http://super.snapscreenapp.com/monitor.php";
+		String filename = "next_" + interval + ".jpg";
+		// String server = "http://super.snapscreenapp.com/monitor.php";
 		String server = "https://isaacserafino.pythonanywhere.com/monitor/";
-		//String server = "http://127.0.0.1:80/monitor/";
+		//String server = "http://127.0.0.1:8000/monitor/";
 
-		doPost(image, "supervisor_id", supervisorId, filename, server);
+		doPost(screenshot, "supervisor_id", supervisorId, filename, server);
 	}
 
-	/** Source: http://stackoverflow.com/a/35013372/7869628 */
-	private void doPost(byte[] image, String fieldName, String fieldValue, String filename,
-			String server) throws MalformedURLException, IOException, ProtocolException {
+	/** Referenced: http://stackoverflow.com/a/35013372/7869628 */
+	private void doPost(RenderedImage image, String fieldName, String fieldValue, String filename, String server)
+			throws MalformedURLException, IOException, ProtocolException {
 		URL url = new URL(server);
 		URLConnection con = url.openConnection();
 		HttpURLConnection http = (HttpURLConnection) con;
@@ -55,35 +57,41 @@ public class Sender {
 		String boundary = randomUUID().toString();
 		http.setRequestProperty("Content-Type", "multipart/form-data; charset=UTF-8; boundary=" + boundary);
 
-		http.setChunkedStreamingMode(0);
+		OutputStream out = http.getOutputStream();
+		Writer streamWriter = new OutputStreamWriter(out, UTF_8);
+		try (Writer writer = new BufferedWriter(streamWriter)) {
+			String partBoundary = "--" + boundary + CRLF;
+			writer.append(partBoundary);
+			sendField(writer, fieldName, fieldValue);
+			writer.append(partBoundary);
 
-		try (OutputStream out = http.getOutputStream()) {
-			String partBoundary = "--" + boundary + "\r\n";
-			write(out, partBoundary);
-			sendField(out, fieldName, fieldValue);
-			write(out, partBoundary);
+			sendImage(out, writer, "activity", image, filename);
 
-			sendFile(out, "activity", image, filename);
-
-			write(out, "--" + boundary + "--");
+			writer.append("--" + boundary + "--");
 		}
+
+		// Although response ignored, this call is required to actually finish sending request
+		http.getResponseCode();
 	}
 
-	private void sendFile(OutputStream out, String name, byte[] contents, String fileName) throws IOException {
-		write(out, "Content-Disposition: form-data; name=\"" + URLEncoder.encode(name, "UTF-8") + "\"; filename=\""
-				+ URLEncoder.encode(fileName, "UTF-8") + "\"\r\n\r\n");
-		out.write(contents);
+	private void sendImage(OutputStream out, Writer writer, String name, RenderedImage contents, String fileName)
+			throws IOException {
+		writer.append("Content-Disposition: form-data; name=\"" + escape(name) + "\"; filename=\"" + escape(fileName)
+				+ "\"\r\n\r\n");
+		writer.flush();
 
-		write(out, "\r\n");
+		ImageIO.write(contents, "jpeg", out);
+
+		writer.append(CRLF);
 	}
 
-	private void sendField(OutputStream out, String name, String fieldValue) throws IOException {
-		write(out, "Content-Disposition: form-data; name=\"" + URLEncoder.encode(name, "UTF-8") + "\"\r\n\r\n");
-		write(out, URLEncoder.encode(fieldValue, "UTF-8"));
-		write(out, "\r\n");
+	private void sendField(Writer writer, String name, String fieldValue) throws IOException {
+		writer.append("Content-Disposition: form-data; name=\"" + escape(name) + "\"\r\n\r\n");
+		writer.append(escape(fieldValue));
+		writer.append(CRLF);
 	}
 
-	private static void write(OutputStream out, String s) throws IOException {
-		out.write(s.getBytes(UTF_8));
+	private static String escape(String s) throws UnsupportedEncodingException {
+		return URLEncoder.encode(s, "UTF-8");
 	}
 }
