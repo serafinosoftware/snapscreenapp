@@ -7,10 +7,8 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.UUID.randomUUID;
 
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -33,17 +31,20 @@ public class Sender {
 	}
 
 	public void sendScreenshotMessage(BufferedImage screenshot, long interval) throws IOException {
-		ByteArrayOutputStream os = new ByteArrayOutputStream();
-		ImageIO.write(screenshot, "jpeg", os);
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		ImageIO.write(screenshot, "jpeg", out);
+		byte[] image = out.toByteArray();
 
 		String filename = "/next_" + interval + ".jpg";
-		String server = "https://deferred-transistor.000webhostapp.com/monitor.php";
+		//String server = "http://super.snapscreenapp.com/monitor.php";
+		String server = "https://isaacserafino.pythonanywhere.com/monitor/";
+		//String server = "http://127.0.0.1:80/monitor/";
 
-		doPost(os, "supervisor_id", supervisorId, filename, server);
+		doPost(image, "supervisor_id", supervisorId, filename, server);
 	}
 
 	/** Source: http://stackoverflow.com/a/35013372/7869628 */
-	private void doPost(ByteArrayOutputStream outputStream, String fieldName, String fieldValue, String filename,
+	private void doPost(byte[] image, String fieldName, String fieldValue, String filename,
 			String server) throws MalformedURLException, IOException, ProtocolException {
 		URL url = new URL(server);
 		URLConnection con = url.openConnection();
@@ -62,21 +63,16 @@ public class Sender {
 			sendField(out, fieldName, fieldValue);
 			write(out, partBoundary);
 
-			try (InputStream is = new ByteArrayInputStream(outputStream.toByteArray())) {
-				sendFile(out, "identification", is, filename);
-			}
+			sendFile(out, "activity", image, filename);
 
 			write(out, "--" + boundary + "--");
 		}
 	}
 
-	private void sendFile(OutputStream out, String name, InputStream in, String fileName) throws IOException {
+	private void sendFile(OutputStream out, String name, byte[] contents, String fileName) throws IOException {
 		write(out, "Content-Disposition: form-data; name=\"" + URLEncoder.encode(name, "UTF-8") + "\"; filename=\""
-				+ URLEncoder.encode(fileName, "UTF-8") + "\"\r\n\r\n");
-
-		byte[] buffer = new byte[2048];
-		for (int n = 0; n >= 0; n = in.read(buffer))
-			out.write(buffer, 0, n);
+				+ URLEncoder.encode(fileName, "UTF-8") + "\"\r\n\r\n");
+		out.write(contents);
 
 		write(out, "\r\n");
 	}

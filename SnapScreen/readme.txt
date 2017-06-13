@@ -19,7 +19,7 @@ Version 1.2.0
 Snap Screen™ App requires the supervisor to create an account, pay the monthly
 fee if applicable, and connect to a cloud storage account (compatible with
 Dropbox) where the screenshots will be sent. The app user should retrieve the
-"Device Code" from the app and provide it to the supervisor to connect the
+"Supervisor ID" from the supervisor and enter it into the app to connect the
 device.
 
 
