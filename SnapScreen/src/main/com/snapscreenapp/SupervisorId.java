@@ -34,7 +34,7 @@ public class SupervisorId {
 		System.out.println("- Device ID: " + id);
 
 		try {
-			Files.write(Paths.get("authorization.txt"), id.getBytes());
+			Files.write(Paths.get(System.getProperty("user.home"), ".snapscreen_authorization.txt"), id.getBytes());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

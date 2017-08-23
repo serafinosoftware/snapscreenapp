@@ -15,7 +15,7 @@ Copyright © 2005 Isaac Serafino www.SerafinoSoftware.com
     License along with this library; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-Version 1.2.0
+Version 1.2.1
 Snap Screen™ App requires the supervisor to create an account, pay the monthly
 fee if applicable, and connect to a cloud storage account (compatible with
 Dropbox) where the screenshots will be sent. The app user should retrieve the

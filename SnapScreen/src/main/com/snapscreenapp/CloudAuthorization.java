@@ -4,7 +4,6 @@
 package com.snapscreenapp;
 
 import static java.nio.file.Files.readAllLines;
-import static java.util.UUID.randomUUID;
 
 import java.awt.Image;
 import java.io.IOException;
@@ -25,7 +24,7 @@ public class CloudAuthorization {
 	}
 
 	public String retrievePassword() throws IOException {
-		Path path = Paths.get("authorization.txt");
+		Path path = Paths.get(System.getProperty("user.home"), ".snapscreen_authorization.txt");
 		if (!Files.exists(path)) {
 			authorize();
 		}
